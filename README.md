@@ -20,7 +20,7 @@ in the "dependencies" section add:
 {
   "dependencies": {
       ...
-      "com.github.oparaskos.unity.tube.renderer": "git+https://github.com/gallinator/unity-tube-renderer.git",
+      "com.github.gallinator.unity.tube.renderer": "git+https://github.com/gallinator/unity-tube-renderer.git",
       ...
   }
 }
