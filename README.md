@@ -22,7 +22,7 @@ in the "dependencies" section add:
 {
   "dependencies": {
       ...
-      "com.github.oparaskos.unity.tube.renderer": "git+https://github.com/gallinator/unity-tube-renderer.git#0.1.3",
+      "com.github.oparaskos.unity.tube.renderer": "git+https://github.com/gallinator/unity-tube-renderer.git",
       ...
   }
 }
