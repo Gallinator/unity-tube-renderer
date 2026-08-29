@@ -2,11 +2,11 @@
   "name": "com.github.gallinator.unity.tube.renderer",
   "displayName": "Unity Tube Renderer",
   "description": "Draw a list of Vector3s as a rope, pipe or tube, with some improvements",
-  "unity": "6000.3",
-  "unityRelease": "19f1",
+  "unity": "2020.1",
+  "unityRelease": "0f1",
   "licenseSpdxId": "MIT",
   "licenseName": "MIT License",
   "repoUrl": "https://github.com/Gallinator/unity-tube-renderer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "library"
 }
