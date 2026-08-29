@@ -1,5 +1,3 @@
-[![openupm](https://img.shields.io/npm/v/com.github.oparaskos.unity.tube.renderer?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.github.oparaskos.unity.tube.renderer/)
-
 # Unity Tube Renderer
 3D version of unity LineRenderer
 
