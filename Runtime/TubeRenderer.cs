@@ -78,13 +78,14 @@ namespace Unity.TubeRenderer
                                             .ToArray();
 
             // To have correct UVs, an additional vertex to close the loop is added
-            int nRadialVerts = segments + 1;
+            int nLoopVerts = segments + 1;
             theta = (Mathf.PI * 2) / segments;
 
-            Vector3[] verts = new Vector3[interpolatedPositions.Length * nRadialVerts];
+            Vector3[] verts = new Vector3[interpolatedPositions.Length * nLoopVerts];
             Vector2[] uvs = new Vector2[verts.Length];
             Vector3[] normals = new Vector3[verts.Length];
-            int[] tris = new int[2 * 3 * verts.Length];
+            // Account for duplicate loop vertices
+            int[] tris = new int[2 * 3 * interpolatedPositions.Length * (nLoopVerts - 1)];
             float cumDist = 0;
 
             for (int i = 0; i < interpolatedPositions.Length; i++)
@@ -97,39 +98,44 @@ namespace Unity.TubeRenderer
                 Vector3 localUp = Vector3.Cross(localForward, Vector3.up);
                 Vector3 localRight = Vector3.Cross(localForward, localUp);
 
-                for (int j = 0; j < nRadialVerts; ++j)
+                for (int j = 0; j < nLoopVerts; ++j)
                 {
                     float t = theta * j;
-                    Vector3 vert = interpolatedPositions[i] + (Mathf.Sin(t) * localUp * dia) + (Mathf.Cos(t) * localRight * dia);
-                    int x = i * nRadialVerts + j;
-                    verts[x] = vert;
-                    // Map V in world space using the current distance along the tube 
-                    uvs[x] = uvScale * new Vector2(t / (Mathf.PI * 2), cumDist);
-                    normals[x] = (vert - interpolatedPositions[i]).normalized;
-                    if (i >= interpolatedPositions.Length - 1) continue;
-                    // Do not create degenerate triangles
-                    if (i == nRadialVerts - 1) continue;
+                    int vertIdx = i * nLoopVerts + j;
 
-                    if (inside) normals[x] = -normals[x];
+                    Vector3 vert = interpolatedPositions[i] + (Mathf.Sin(t) * localUp * dia) + (Mathf.Cos(t) * localRight * dia);
+                    verts[vertIdx] = vert;
+
+                    // Map V in world space using the current distance along the tube 
+                    uvs[vertIdx] = uvScale * new Vector2(t / (Mathf.PI * 2), cumDist);
+
+                    normals[vertIdx] = (vert - interpolatedPositions[i]).normalized;
+                    if (inside) normals[vertIdx] = -normals[vertIdx];
+
+                    if (i >= interpolatedPositions.Length - 1) continue;
+                    // Do not add last degenerate triangle
+                    if (j >= nLoopVerts - 1) continue;
+
+                    int trisId = (i * (nLoopVerts - 1) + j) * 6;
                     if (inside)
                     {
-                        tris[x * 6] = x;
-                        tris[x * 6 + 1] = x + nRadialVerts;
-                        tris[x * 6 + 2] = x + 1;
+                        tris[trisId] = vertIdx + nLoopVerts;
+                        tris[trisId + 1] = vertIdx + 1;
+                        tris[trisId + 2] = vertIdx;
 
-                        tris[x * 6 + 3] = x;
-                        tris[x * 6 + 4] = x + nRadialVerts - 1;
-                        tris[x * 6 + 5] = x + nRadialVerts;
+                        tris[trisId + 3] = vertIdx + nLoopVerts;
+                        tris[trisId + 4] = vertIdx + 1 + nLoopVerts;
+                        tris[trisId + 5] = vertIdx + 1;
                     }
                     else
                     {
-                        tris[x * 6] = x + 1;
-                        tris[x * 6 + 1] = x + nRadialVerts;
-                        tris[x * 6 + 2] = x;
+                        tris[trisId] = vertIdx;
+                        tris[trisId + 1] = vertIdx + 1;
+                        tris[trisId + 2] = vertIdx + nLoopVerts;
 
-                        tris[x * 6 + 3] = x + nRadialVerts;
-                        tris[x * 6 + 4] = x + nRadialVerts - 1;
-                        tris[x * 6 + 5] = x;
+                        tris[trisId + 3] = vertIdx + 1;
+                        tris[trisId + 4] = vertIdx + 1 + nLoopVerts;
+                        tris[trisId + 5] = vertIdx + nLoopVerts;
                     }
                 }
             }
