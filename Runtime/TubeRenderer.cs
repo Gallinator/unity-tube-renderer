@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
@@ -55,12 +56,11 @@ namespace Unity.TubeRenderer
         {
             meshFilter = GetComponent<MeshFilter>();
             meshRenderer = GetComponent<MeshRenderer>();
-            Material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            Material = (Material == null) ? new Material(Shader.Find("Universal Render Pipeline/Lit")) : Material;
             if (mesh == null) mesh = new Mesh();
             meshFilter.mesh = CreateMesh();
             lastUpdate = PropHashCode();
         }
-
 
         private Mesh CreateMesh()
         {
@@ -188,7 +188,7 @@ namespace Unity.TubeRenderer
                     ^ Material.GetHashCode();
         }
 
-        private void LateUpdate()
+        public void EditorUpdate()
         {
             if (lastUpdate != PropHashCode())
             {
