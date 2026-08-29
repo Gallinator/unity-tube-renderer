@@ -29,3 +29,10 @@ in the "dependencies" section add:
 ```
 
 Find more information about this [here](https://docs.unity3d.com/Manual/upm-git.html).
+
+## Improvements from original
+ - Fixed error when adding the TubeRenderer component to a gameobject
+ - MeshFilter is created automatically
+ - Support material assignment from inspector (defaults to URP Lit)
+ - Support world space points
+ - Fix UV mapping seams with correct UV scale
