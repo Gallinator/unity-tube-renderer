@@ -25,6 +25,7 @@ namespace Unity.TubeRenderer
         public Vector2 uvScale = Vector2.one;
         public bool inside = false;
         public Material Material;
+        public bool UseWorldSpace = true;
 
         private MeshFilter meshFilter;
         private MeshRenderer meshRenderer;
@@ -70,6 +71,11 @@ namespace Unity.TubeRenderer
                 .Select(f => GetPosition(f))
                 .Append(positions.Last())
                 .ToArray();
+
+            if (UseWorldSpace)
+                interpolatedPositions = interpolatedPositions
+                                            .Select((p) => transform.InverseTransformPoint(p))
+                                            .ToArray();
 
             theta = (Mathf.PI * 2) / segments;
 
