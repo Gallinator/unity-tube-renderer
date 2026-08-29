@@ -166,7 +166,8 @@ namespace Unity.TubeRenderer
                 for (int i = 0; i < positions.Length; ++i)
                 {
                     float dia = Mathf.Lerp(startWidth, endWidth, (float)i / positions.Length);
-                    Gizmos.DrawSphere(transform.position + positions[i], dia);
+                    Vector3 pos = UseWorldSpace ? positions[i] : transform.TransformPoint(positions[i]);
+                    Gizmos.DrawSphere(pos, dia);
                 }
             }
         }
