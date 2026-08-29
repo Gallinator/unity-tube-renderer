@@ -77,9 +77,11 @@ namespace Unity.TubeRenderer
                                             .Select((p) => transform.InverseTransformPoint(p))
                                             .ToArray();
 
+            // To have correct UVs, an additional vertex to close the loop is added
+            int nRadialVerts = segments + 1;
             theta = (Mathf.PI * 2) / segments;
 
-            Vector3[] verts = new Vector3[interpolatedPositions.Length * segments];
+            Vector3[] verts = new Vector3[interpolatedPositions.Length * nRadialVerts];
             Vector2[] uvs = new Vector2[verts.Length];
             Vector3[] normals = new Vector3[verts.Length];
             int[] tris = new int[2 * 3 * verts.Length];
@@ -89,42 +91,44 @@ namespace Unity.TubeRenderer
             {
                 float dia = Mathf.Lerp(startWidth, endWidth, (float)i / interpolatedPositions.Length);
 
-                Vector3 localForward = GetVertexDir(interpolatedPositions, i);
-                cumDist += localForward.magnitude;
-                localForward = localForward.normalized;
+                cumDist += (i == 0) ? 0 : Vector3.Distance(interpolatedPositions[i], interpolatedPositions[i - 1]);
+
+                Vector3 localForward = GetVertexFwd(interpolatedPositions, i);
                 Vector3 localUp = Vector3.Cross(localForward, Vector3.up);
                 Vector3 localRight = Vector3.Cross(localForward, localUp);
 
-                for (int j = 0; j < segments; ++j)
+                for (int j = 0; j < nRadialVerts; ++j)
                 {
                     float t = theta * j;
                     Vector3 vert = interpolatedPositions[i] + (Mathf.Sin(t) * localUp * dia) + (Mathf.Cos(t) * localRight * dia);
-                    int x = i * segments + j;
+                    int x = i * nRadialVerts + j;
                     verts[x] = vert;
                     // Map V in world space using the current distance along the tube 
                     uvs[x] = uvScale * new Vector2(t / (Mathf.PI * 2), cumDist);
                     normals[x] = (vert - interpolatedPositions[i]).normalized;
                     if (i >= interpolatedPositions.Length - 1) continue;
+                    // Do not create degenerate triangles
+                    if (i == nRadialVerts - 1) continue;
 
                     if (inside) normals[x] = -normals[x];
                     if (inside)
                     {
                         tris[x * 6] = x;
-                        tris[x * 6 + 1] = x + segments;
+                        tris[x * 6 + 1] = x + nRadialVerts;
                         tris[x * 6 + 2] = x + 1;
 
                         tris[x * 6 + 3] = x;
-                        tris[x * 6 + 4] = x + segments - 1;
-                        tris[x * 6 + 5] = x + segments;
+                        tris[x * 6 + 4] = x + nRadialVerts - 1;
+                        tris[x * 6 + 5] = x + nRadialVerts;
                     }
                     else
                     {
                         tris[x * 6] = x + 1;
-                        tris[x * 6 + 1] = x + segments;
+                        tris[x * 6 + 1] = x + nRadialVerts;
                         tris[x * 6 + 2] = x;
 
-                        tris[x * 6 + 3] = x + segments;
-                        tris[x * 6 + 4] = x + segments - 1;
+                        tris[x * 6 + 3] = x + nRadialVerts;
+                        tris[x * 6 + 4] = x + nRadialVerts - 1;
                         tris[x * 6 + 5] = x;
                     }
                 }
@@ -139,7 +143,7 @@ namespace Unity.TubeRenderer
             return mesh;
         }
 
-        private Vector3 GetVertexDir(Vector3[] positions, int i)
+        private Vector3 GetVertexFwd(Vector3[] positions, int i)
         {
             Vector3 lastPosition;
             Vector3 thisPosition;
@@ -159,7 +163,7 @@ namespace Unity.TubeRenderer
             {
                 thisPosition = positions[i];
             }
-            return lastPosition - thisPosition;
+            return (lastPosition - thisPosition).normalized;
         }
 
         private void OnDrawGizmos()
