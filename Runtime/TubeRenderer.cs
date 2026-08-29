@@ -167,7 +167,14 @@ namespace Unity.TubeRenderer
 
         private int PropHashCode()
         {
-            return positions.Aggregate(0, (total, it) => total ^ it.GetHashCode()) ^ positions.GetHashCode() ^ segments.GetHashCode() ^ subdivisions.GetHashCode() ^ startWidth.GetHashCode() ^ endWidth.GetHashCode();
+            return positions.Aggregate(0, (total, it) => total
+                    ^ it.GetHashCode())
+                    ^ positions.GetHashCode()
+                    ^ segments.GetHashCode()
+                    ^ subdivisions.GetHashCode()
+                    ^ startWidth.GetHashCode()
+                    ^ endWidth.GetHashCode()
+                    ^ Material.GetHashCode();
         }
 
         private void LateUpdate()
