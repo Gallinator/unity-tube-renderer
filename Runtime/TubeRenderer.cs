@@ -83,12 +83,15 @@ namespace Unity.TubeRenderer
             Vector2[] uvs = new Vector2[verts.Length];
             Vector3[] normals = new Vector3[verts.Length];
             int[] tris = new int[2 * 3 * verts.Length];
+            float cumDist = 0;
 
             for (int i = 0; i < interpolatedPositions.Length; i++)
             {
                 float dia = Mathf.Lerp(startWidth, endWidth, (float)i / interpolatedPositions.Length);
 
-                Vector3 localForward = GetVertexFwd(interpolatedPositions, i);
+                Vector3 localForward = GetVertexDir(interpolatedPositions, i);
+                cumDist += localForward.magnitude;
+                localForward = localForward.normalized;
                 Vector3 localUp = Vector3.Cross(localForward, Vector3.up);
                 Vector3 localRight = Vector3.Cross(localForward, localUp);
 
@@ -98,7 +101,8 @@ namespace Unity.TubeRenderer
                     Vector3 vert = interpolatedPositions[i] + (Mathf.Sin(t) * localUp * dia) + (Mathf.Cos(t) * localRight * dia);
                     int x = i * segments + j;
                     verts[x] = vert;
-                    uvs[x] = uvScale * new Vector2(t / (Mathf.PI * 2), ((float)i * positions.Length) / (float)subdivisions);
+                    // Map V in world space using the current distance along the tube 
+                    uvs[x] = uvScale * new Vector2(t / (Mathf.PI * 2), cumDist);
                     normals[x] = (vert - interpolatedPositions[i]).normalized;
                     if (i >= interpolatedPositions.Length - 1) continue;
 
@@ -135,7 +139,7 @@ namespace Unity.TubeRenderer
             return mesh;
         }
 
-        private Vector3 GetVertexFwd(Vector3[] positions, int i)
+        private Vector3 GetVertexDir(Vector3[] positions, int i)
         {
             Vector3 lastPosition;
             Vector3 thisPosition;
@@ -155,7 +159,7 @@ namespace Unity.TubeRenderer
             {
                 thisPosition = positions[i];
             }
-            return (lastPosition - thisPosition).normalized;
+            return lastPosition - thisPosition;
         }
 
         private void OnDrawGizmos()
