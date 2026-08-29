@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.TubeRenderer
 {
-    [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     [ExecuteInEditMode]
     public class TubeRenderer : MonoBehaviour
     {
