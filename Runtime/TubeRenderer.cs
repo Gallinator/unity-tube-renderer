@@ -16,7 +16,7 @@ namespace Unity.TubeRenderer
         public int subdivisions = 3;
         [Min(0)]
         public int segments = 8;
-        public Vector3[] positions;
+        public Vector3[] positions = new Vector3[0];
         [Min(0)]
         public float startWidth = 1f;
         [Min(0)]
