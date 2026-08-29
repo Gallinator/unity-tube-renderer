@@ -24,8 +24,10 @@ namespace Unity.TubeRenderer
         public bool showNodesInEditor = false;
         public Vector2 uvScale = Vector2.one;
         public bool inside = false;
+        public Material Material;
 
         private MeshFilter meshFilter;
+        private MeshRenderer meshRenderer;
         private Mesh mesh = null;
         private float theta = 0f;
         private int lastUpdate = 0;
@@ -51,6 +53,8 @@ namespace Unity.TubeRenderer
         private void Awake()
         {
             meshFilter = GetComponent<MeshFilter>();
+            meshRenderer = GetComponent<MeshRenderer>();
+            Material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             if (mesh == null) mesh = new Mesh();
             meshFilter.mesh = CreateMesh();
             lastUpdate = PropHashCode();
@@ -121,6 +125,7 @@ namespace Unity.TubeRenderer
             mesh.normals = normals;
             mesh.SetTriangles(tris, 0);
             mesh.RecalculateBounds();
+            meshRenderer.material = Material;
             return mesh;
         }
 
